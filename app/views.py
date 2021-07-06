@@ -12,21 +12,26 @@ from django.utils.decorators import method_decorator    #for class based views
 #  return render(request, 'app/home.html')
 class ProductView(View):
     def get(self, request):
+        totalitem = 0
         topwears = Product.objects.filter(category='TW')
         bottomwears = Product.objects.filter(category='BW')
         mobiles = Product.objects.filter(category='M')
-        return render(request, 'app/home.html', 
-        {'topwears':topwears, 'bottomwears':bottomwears, 'mobiles':mobiles})
+        laptops = Product.objects.filter(category='L')
+        if request.user.is_authenticated:
+            totalitem=len(Cart.objects.filter(user=request.user))
+        return render(request,'app/home.html',{'topwears':topwears,'bottomwears':bottomwears,'mobiles':mobiles,'laptops':laptops,'totalitem':totalitem})
 
 # def product_detail(request):
 #  return render(request, 'app/productdetail.html')
 class ProductDetailView(View):
     def get(self, request, pk):
+        totalitem = 0
         product = Product.objects.get(pk=pk)
         item_in_cart = False
         if request.user.is_authenticated:
             item_in_cart = Cart.objects.filter(Q(product=product.id) & Q(user=request.user)).exists()
-        return render(request, 'app/productdetail.html', {'product':product, 'item_in_cart':item_in_cart})
+            totalitem=len(Cart.objects.filter(user=request.user))
+        return render(request, 'app/productdetail.html', {'product':product, 'item_in_cart':item_in_cart,'totalitem':totalitem})
 
 
 
@@ -35,6 +40,7 @@ def change_password(request):
 
 
 def mobile(request, data=None):
+    totalitem = 0
     if data==None:
         mobiles = Product.objects.filter(category='M')
     elif (data.lower()=='samsung' or data.lower()=="apple"):
@@ -42,8 +48,53 @@ def mobile(request, data=None):
     elif data=='below':
         mobiles = Product.objects.filter(category='M').filter(discounted_price__lt=10000)  
     elif data=='above':
-        mobiles = Product.objects.filter(category='M').filter(discounted_price__gt=10000)      
-    return render(request, 'app/mobile.html', {'mobiles':mobiles})
+        mobiles = Product.objects.filter(category='M').filter(discounted_price__gt=10000) 
+    if request.user.is_authenticated:         
+        totalitem=len(Cart.objects.filter(user=request.user))
+    return render(request, 'app/mobile.html', {'mobiles':mobiles,'totalitem':totalitem})
+
+def topwear(request,data=None):
+    totalitem = 0
+    if data==None:
+        topwears=Product.objects.filter(category='TW')
+    elif data=='levis' or data=='lee':
+        topwears=Product.objects.filter(category='TW').filter(brand=data)
+    elif data=='below':
+        topwears=Product.objects.filter(category='TW').filter(discounted_price__lt=500)
+    elif data=='above':
+        topwears=Product.objects.filter(category='TW').filter(discounted_price__gt=500)
+    if request.user.is_authenticated:
+        totalitem=len(Cart.objects.filter(user=request.user))
+    return render(request, 'app/topwear.html',{'topwears':topwears,'totalitem':totalitem})
+
+def bottomwear(request,data=None):
+    totalitem = 0
+    if data==None:
+        bottomwears=Product.objects.filter(category='BW')
+    elif data=='levis' or data=='wrangler':
+        bottomwears=Product.objects.filter(category='BW').filter(brand=data)
+    elif data=='below':
+        bottomwears=Product.objects.filter(category='BW').filter(discounted_price__lt=500)
+    elif data=='above':
+        bottomwears=Product.objects.filter(category='BW').filter(discounted_price__gt=500)
+    if request.user.is_authenticated:
+        totalitem=len(Cart.objects.filter(user=request.user))
+    return render(request, 'app/bottomwear.html',{'bottomwears':bottomwears,'totalitem':totalitem})  
+
+def laptop(request,data=None):
+    totalitem = 0
+    if data==None:
+        laptops=Product.objects.filter(category='L')
+    elif data=='ASUS' or data=='HP':
+        laptops=Product.objects.filter(category='L').filter(brand=data)
+    elif data=='below':
+        laptops=Product.objects.filter(category='L').filter(discounted_price__lt=50000)
+    elif data=='above':
+        laptops=Product.objects.filter(category='L').filter(discounted_price__gt=50000)
+    if request.user.is_authenticated:
+        totalitem=len(Cart.objects.filter(user=request.user))
+    return render(request, 'app/laptop.html',{'laptops':laptops,'totalitem':totalitem})
+
 
 # def login(request):
 #  return render(request, 'app/login.html')
@@ -65,7 +116,8 @@ class CustomerRegistrationView(View):
 class ProfileView(View):
     def get(self, request):
         form = CustomerProfileForm()
-        return render(request, 'app/profile.html', {'form':form, 'active':'btn-primary'}) 
+        totalitem=len(Cart.objects.filter(user=request.user))
+        return render(request, 'app/profile.html', {'form':form, 'active':'btn-primary','totalitem':totalitem}) 
     def post(self, request):
         form = CustomerProfileForm(request.POST)
         if form.is_valid(): 
@@ -78,11 +130,13 @@ class ProfileView(View):
             reg = Customer(user=user, name=name, locality=locality, city=city, zipcode=zipcode, state=state)
             reg.save()
             messages.success(request, 'Profile Updated! Successfully')
-        return render(request, 'app/profile.html', {'form':form, 'active':'btn-primary'})    
+        totalitem=len(Cart.objects.filter(user=request.user))
+        return render(request, 'app/profile.html', {'form':form, 'active':'btn-primary','totalitem':totalitem})    
 @login_required
 def address(request):
     add = Customer.objects.filter(user=request.user)
-    return render(request, 'app/address.html', {'address':add, 'active':'btn-primary'})
+    totalitem=len(Cart.objects.filter(user=request.user))
+    return render(request, 'app/address.html', {'address':add, 'active':'btn-primary','totalitem':totalitem})
 @login_required
 def add_to_cart(request):
     user = request.user
@@ -107,7 +161,8 @@ def show_cart(request):
         # print(total_amount)
         if amount==0:
             return render(request, 'app/emptycart.html')
-        return render(request, 'app/addtocart.html', {'carts':cart, 'totam':total_amount, 'amount':amount})
+        totalitem=len(Cart.objects.filter(user=request.user))    
+        return render(request, 'app/addtocart.html', {'carts':cart, 'totam':total_amount, 'amount':amount,'totalitem':totalitem})
 def plus_cart(request):
     if request.method == "GET":
         prod_id = request.GET['prod_id']
@@ -177,7 +232,8 @@ def checkout(request):
     for pro in cart_items:
         amount+=(pro.quantity * pro.product.discounted_price)
     total_amount = amount+shipping_amount   
-    return render(request, 'app/checkout.html', {'address':address, 'total_amount':total_amount, 'cart_items':cart_items})
+    totalitem=len(Cart.objects.filter(user=request.user))
+    return render(request, 'app/checkout.html', {'address':address, 'total_amount':total_amount, 'cart_items':cart_items,'totalitem':totalitem})
 @login_required
 def placeorder(request):
     user = request.user
@@ -192,9 +248,13 @@ def placeorder(request):
 @login_required
 def orders(request):
     op = OrderPlaced.objects.filter(user=request.user)
-    return render(request, 'app/orders.html', {'ordered_placed':op})
+    totalitem=len(Cart.objects.filter(user=request.user))
+    return render(request, 'app/orders.html', {'ordered_placed':op,'totalitem':totalitem})
 
+
+@login_required
 def buy_now(request):
- return render(request, 'app/buynow.html')
+    totalitem=len(Cart.objects.filter(user=request.user))
+    return render(request, 'app/buynow.html',{'totalitem':totalitem})
 
 

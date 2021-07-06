@@ -11,6 +11,12 @@ urlpatterns = [
     path('product-detail/<int:pk>', views.ProductDetailView.as_view(), name='product-detail'),
     path('mobile/', views.mobile, name='mobile'),
     path('mobile/<slug:data>', views.mobile, name='mobiledata'),#url will search with name
+    path('topwear/', views.topwear, name='topwear'),
+    path('topwear/<slug:data>/', views.topwear, name='topweardata'),
+    path('bottomwear/', views.bottomwear, name='bottomwear'),
+    path('bottomwear/<slug:data>/', views.bottomwear, name='bottomweardata'),
+    path('laptop/', views.laptop, name='laptop'),
+    path('laptop/<slug:data>/', views.laptop, name='laptopdata'),
     #authentication
     path('registration/', views.CustomerRegistrationView.as_view(), name='customerregistration'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='app/login.html', authentication_form=LoginForm), name='login'),

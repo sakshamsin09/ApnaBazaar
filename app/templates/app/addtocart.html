@@ -11,7 +11,10 @@
     <h3>Cart</h3>
     {% for cart in carts %}
     <div class="row">
-      <div class="col-sm-3 text-center align-self-center"><img src="{{cart.product.product_image.url}}" alt="" srcset="" class="img-fluid img-thumbnail shadow-sm" height="150" width="150"> </div>
+      <div class="col-sm-3 text-center align-self-center">
+        <a href="{% url 'product-detail' cart.product.id %}"><img src="{{cart.product.product_image.url}}" alt="" srcset="" class="img-fluid img-thumbnail shadow-sm" height="150" width="150">
+        </a>
+        </div>
       <div class="col-sm-9">
        <div>
         <h5>{{cart.product.title}}</h5>
