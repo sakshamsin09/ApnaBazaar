@@ -110,7 +110,7 @@ class CustomerRegistrationView(View):
         if form.is_valid():
             messages.success(request, 'Registered Successfully')
             form.save()
-        return render(request, 'app/customerregistration.html', {'form':form})
+        return redirect('/accounts/login')
 
 @method_decorator(login_required, name='dispatch')
 class ProfileView(View):
@@ -255,6 +255,12 @@ def orders(request):
 @login_required
 def buy_now(request):
     totalitem=len(Cart.objects.filter(user=request.user))
-    return render(request, 'app/buynow.html',{'totalitem':totalitem})
+    user = request.user
+    product_id = request.GET.get('prod_id')
+    product = Product.objects.get(id=product_id)
+    obj = Cart(user=user, product=product)
+    obj.save()
+    return redirect('/checkout')
+    # return render(request, 'app/buynow.html',{'totalitem':totalitem})
 
 
