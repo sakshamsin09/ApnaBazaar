@@ -23,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-e6=w*8y-%v5dia^8xs^=w8t8s749svo^q_qiu=1m*z&xjd30y)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # ALLOWED_HOSTS = ['apnabazaar-sak.herokuapp.com', 'localhost:8000']
-ALLOWED_HOSTS = ['apnabazaar-sak.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['apnabazaar-sak.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -120,10 +120,18 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'media/productimg')
 STATIC_URL = '/static/'
+# LOCAL_STATIC_CDN_PATH = os.path.join(BASE_DIR, 'media')
+# STATIC_ROOT = os.path.join(LOCAL_STATIC_CDN_PATH, 'static')     #main for deployment
+STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_DIRS = [
+    # os.path.join(BASE_DIR, 'app\static'),
+    BASE_DIR / "app\static" ,
+]
+
 MEDIA_URL = '/media/'    #new
 MEDIA_ROOT = BASE_DIR / 'media'     #new
+
 LOGIN_REDIRECT_URL = '/profile/' #go to profile on login
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
