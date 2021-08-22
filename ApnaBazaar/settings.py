@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-e6=w*8y-%v5dia^8xs^=w8t8s749svo^q_qiu=1m*z&xjd30y)
 DEBUG = False
 
 # ALLOWED_HOSTS = ['apnabazaar-sak.herokuapp.com', 'localhost:8000']
-ALLOWED_HOSTS = ['apnabazaar-sak2.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['apnabazaar-sak2.herokuapp.com','apnabazaar-sak.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
